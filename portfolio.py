@@ -8,18 +8,32 @@ class Portfolio:
       self.assets = []
       self.total_value = 0
 
+  # def read_portfolio(self, file_path):
+  #     file = pd.read_csv(file_path)
+  #     # read in type, ticker, shares, value
+  #     # depending on type create a different object
+  #     for row in file:
+  #         if row[0] == 'Cash':
+  #             cash = Cash(row['Ticker'], row['Shares'])
+  #             self.assets.append(cash)
+  #         else:
+  #             equity = Equity(row['Ticker'], row['Shares'])
+  #             self.assets.append(equity)
+  #     return self.assets
+      
   def read_portfolio(self, file_path):
-      file = pd.read_csv(file_path)
-      # read in type, ticker, shares, value
-      # depending on type create a different object
-      for row in file:
-          if row['type'] == 'Cash':
-              cash = Cash(row['ticker'], row['shares'])
-              self.assets.append(cash)
-          else:
-              equity = Equity(row['ticker'], row['shares'])
-              self.assets.append(equity)
-      return self.assets
+    file = pd.read_csv(file_path)
+    # read in type, ticker, shares, value
+    # depending on type create a different object
+    for index, row in file.iterrows():
+        if row.iloc[0] == 'Cash':
+            cash = Cash(row.iloc[1], row.iloc[2])
+            self.assets.append(cash)
+        else:
+            equity = Equity(row.iloc[1], row.iloc[2])
+            self.assets.append(equity)
+    return self.assets
+
       
   def portfolio_size(self):
       for asset in self.assets:
@@ -31,3 +45,8 @@ class Portfolio:
 
   def get_portfolio(self):
       return self.assets
+
+  def print_portfolio(self):
+      for asset in self.assets:
+          asset.print()
+          print("\n")
