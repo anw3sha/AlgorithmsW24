@@ -32,6 +32,18 @@ class Portfolio:
         else:
             equity = Equity(row.iloc[1], row.iloc[2])
             self.assets.append(equity)
+
+    for asset in self.assets:
+        if asset.type == AssetType.CASH:
+            self.total_value += asset.quantity
+        else:
+            self.total_value += asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1]
+          
+    for asset in self.assets:
+        if asset.type == AssetType.CASH:
+            asset.ratio_to_entire_portfolio = asset.quantity / self.total_value
+        else:
+            asset.ratio_to_entire_portfolio = asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1] / self.total_value
     return self.assets
 
       
@@ -50,3 +62,60 @@ class Portfolio:
       for asset in self.assets:
           asset.print()
           print("\n")
+          
+  def print_to_csv(self, filename):
+      with open(filename, 'w', newline='') as file:
+          writer = csv.writer(file)
+          writer.writerow(["Ticker", "Shares", "Current Price", "Ratio to entire portfolio", "Average Volume", "52 Week High", "52 Week Low", "Beta SP"])
+      for asset in self.assets:
+          asset.to_csv(filename)
+
+  def fix_ratios(self):
+    for asset in self.assets:
+      if asset.type == AssetType.CASH:
+          asset.ratio_to_entire_portfolio = asset.quantity / self.total_value
+      else:
+          asset.ratio_to_entire_portfolio = asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1] / self.total_value
+      
+  def updateMarkets(self):
+      self.total_value = 0
+      for asset in self.assets:
+          asset.updateMarkets()
+      
+      self.total_value = self.portfolio_size()
+      self.fix_ratios()
+
+     
+  def buy(self, ticker, quantity):
+    if ticker == 'CASH':
+        self.assets[0].quantity += quantity
+        self.updateMarkets()
+    else: 
+      for asset in self.assets:
+        if asset.ticker == ticker:
+          asset.quantity += quantity
+          self.updateMarkets()
+          # update cash
+          return
+
+      # figure out the type of the asset  
+      equity = Equity(ticker, quantity)
+      self.assets.append(equity)   
+      self.updateMarkets()   
+  
+  def sell(self, ticker, quantity):
+    for asset in self.assets:
+      if asset.ticker == ticker:
+        asset.quantity -= quantity
+        if asset.quantity == 0:
+          self.assets.remove(asset)
+          # update cash
+      else:
+          print("Asset not found")
+    self.updateMarkets()
+
+    def rebalance():
+      self.updateMarkets()
+       
+      # accept a csv file with the new ratios, then rebalance the portfolio and update markets
+      # buy and sell according to intented ratios

@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Python: Debug",
+            "program": "./main.py",
+            "args": [],
+            "cwd": "./",
+            "env": {},
+            "envFile": "./enviornment",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        }
+    ]
+}
