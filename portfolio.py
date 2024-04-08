@@ -116,8 +116,12 @@ class Portfolio:
           print("Asset not found")
     self.updateMarkets()
 
-    def rebalance():
-      self.updateMarkets()
+    
+  def test(self):
+    print(self.assets[3].ticker.info)
+
+  def rebalance():
+    self.updateMarkets()
        
       # accept a csv file with the new ratios, then rebalance the portfolio and update markets
       # buy and sell according to intented ratios

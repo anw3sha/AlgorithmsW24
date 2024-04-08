@@ -43,7 +43,13 @@ class Equity(Asset):
         try:
           self.beta_SP = self.ticker.info['beta']
         except KeyError:
-            self.beta_SP = None  
+          try:
+            self.beta_SP = self.ticker.info['beta3Year']
+          except KeyError:
+            try:
+              self.beta_SP = self.ticker.info['beta5Year']
+            except KeyError:
+              self.beta_SP = None
         
     def updateMarkets(self):
         self.current_price = self.ticker.history(period="1d")['Close'].iloc[-1]
@@ -53,7 +59,13 @@ class Equity(Asset):
         try:
           self.beta_SP = self.ticker.info['beta']
         except KeyError:
-            self.beta_SP = None
+          try:
+            self.beta_SP = self.ticker.info['beta3Year']
+          except KeyError:
+            try:
+              self.beta_SP = self.ticker.info['beta5Year']
+            except KeyError:
+              self.beta_SP = None
     
     
     def print (self):
