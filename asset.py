@@ -16,19 +16,20 @@ class AssetType(Enum):
     CASH = "Cash"
 
 class Asset:
-    def __init__(self, ticker, quantity):
+    def __init__(self, type, ticker, quantity):
+        self.type = type
         self.ticker = ticker
         self.quantity = quantity
 
 class Equity(Asset):
-    def __init__(self, ticker, shares):       
-        super().__init__(ticker, shares) 
+    def __init__(self, type, ticker, shares):  
+        super().__init__(type, ticker, shares) 
+        self.classification = AssetType.EQUITY
         self.tickerstr = ticker.upper()
         self.ticker = yf.Ticker(ticker.upper())
-        self.shares = shares 
+        self.shares = int(shares)
         self.balanced = False #todo don't forget about this
 
-        self.type = AssetType.EQUITY
         self.equityType = None
 
         self.current_price = self.ticker.history(period="1d")['Close'].iloc[-1]
@@ -70,24 +71,26 @@ class Equity(Asset):
     def to_csv(self, filename):
         with open(filename, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([self.tickerstr, self.shares, self.current_price, self.ratio_to_entire_portfolio, self.avg_volume, self.fifty_two_week_high, self.fifty_two_week_low, self.beta_SP])
+            writer.writerow([self.type, self.tickerstr, self.shares, self.current_price, self.ratio_to_entire_portfolio, self.beta_SP])
 
 
 class Cash(Asset):
-    def __init__(self, ticker, quantity):
-        super().__init__(ticker, quantity)
-        self.type = AssetType.CASH
+    def __init__(self, type, ticker, quantity):
+        super().__init__(type, ticker, quantity)
+        self.shares = 1       
         self.ratio_to_entire_portfolio = -1.0
+        self.classification = AssetType.CASH
 
     def print(self):
         print("Ticker: ", self.ticker)
+        print("Shares: ", self.shares)
         print("Quantity: ", self.quantity)
         print("Ratio to entire portfolio: ", self.ratio_to_entire_portfolio)
     
     def to_csv(self, filename):
         with open(filename, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([self.ticker, self.quantity, " ", self.ratio_to_entire_portfolio, " ", " ", " ", " "])
+            writer.writerow([self.type, self.ticker, self.shares, self.quantity, self.ratio_to_entire_portfolio, " "])
     
     def updateMarkets(self):
         pass

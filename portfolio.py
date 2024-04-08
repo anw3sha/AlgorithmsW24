@@ -27,20 +27,20 @@ class Portfolio:
     # depending on type create a different object
     for index, row in file.iterrows():
         if row.iloc[0] == 'Cash':
-            cash = Cash(row.iloc[1], row.iloc[2])
+            cash = Cash(row.iloc[0], row.iloc[1], row.iloc[2])
             self.assets.append(cash)
         else:
-            equity = Equity(row.iloc[1], row.iloc[2])
+            equity = Equity(row.iloc[0], row.iloc[1], row.iloc[2])
             self.assets.append(equity)
 
     for asset in self.assets:
-        if asset.type == AssetType.CASH:
+        if asset.classification == AssetType.CASH:
             self.total_value += asset.quantity
         else:
             self.total_value += asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1]
           
     for asset in self.assets:
-        if asset.type == AssetType.CASH:
+        if asset.classification == AssetType.CASH:
             asset.ratio_to_entire_portfolio = asset.quantity / self.total_value
         else:
             asset.ratio_to_entire_portfolio = asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1] / self.total_value
@@ -49,7 +49,7 @@ class Portfolio:
       
   def portfolio_size(self):
       for asset in self.assets:
-        if asset.type == AssetType.CASH:
+        if asset.classification == AssetType.CASH:
           self.total_value += asset.quantity
         else:
           self.total_value += asset.quantity * asset.ticker.history(period="1d")
@@ -66,13 +66,13 @@ class Portfolio:
   def print_to_csv(self, filename):
       with open(filename, 'w', newline='') as file:
           writer = csv.writer(file)
-          writer.writerow(["Ticker", "Shares", "Current Price", "Ratio to entire portfolio", "Average Volume", "52 Week High", "52 Week Low", "Beta SP"])
+          writer.writerow(["Ticker", "Shares", "Current Price", "Ratio to entire portfolio", "Beta SP"])
       for asset in self.assets:
           asset.to_csv(filename)
 
   def fix_ratios(self):
     for asset in self.assets:
-      if asset.type == AssetType.CASH:
+      if asset.classification == AssetType.CASH:
           asset.ratio_to_entire_portfolio = asset.quantity / self.total_value
       else:
           asset.ratio_to_entire_portfolio = asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1] / self.total_value
@@ -94,19 +94,21 @@ class Portfolio:
       for asset in self.assets:
         if asset.ticker == ticker:
           asset.quantity += quantity
+          self.assets[0].quantity -= asset.current_price * quantity # update cash
           self.updateMarkets()
-          # update cash
           return
-
-      # figure out the type of the asset  
-      equity = Equity(ticker, quantity)
-      self.assets.append(equity)   
-      self.updateMarkets()   
+        else: 
+           equity = Equity(ticker, quantity)
+           self.assets.append(equity)
+           self.assets[0].quantity -= asset.current_price * quantity # update cash
+           self.updateMarkets()
+           return
   
   def sell(self, ticker, quantity):
     for asset in self.assets:
       if asset.ticker == ticker:
         asset.quantity -= quantity
+        self.assets[0].quantity += asset.current_price * quantity # update cash
         if asset.quantity == 0:
           self.assets.remove(asset)
           # update cash
