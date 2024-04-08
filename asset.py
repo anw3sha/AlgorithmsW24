@@ -30,7 +30,10 @@ class Equity(Asset):
         self.shares = int(shares)
         self.balanced = False #todo don't forget about this
 
-        self.equityType = None
+        try:
+          self.industry = self.ticker.info['sector']
+        except KeyError:
+          self.industry = self.type
 
         self.current_price = self.ticker.history(period="1d")['Close'].iloc[-1]
         self.ratio_to_entire_portfolio = -1.0
@@ -83,7 +86,7 @@ class Equity(Asset):
     def to_csv(self, filename):
         with open(filename, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([self.type, self.tickerstr, self.shares, self.current_price, self.ratio_to_entire_portfolio, self.beta_SP])
+            writer.writerow([self.type, self.industry, self.tickerstr, self.shares, self.current_price, self.ratio_to_entire_portfolio, self.beta_SP])
 
 
 class Cash(Asset):
@@ -102,7 +105,7 @@ class Cash(Asset):
     def to_csv(self, filename):
         with open(filename, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([self.type, self.ticker, self.shares, self.quantity, self.ratio_to_entire_portfolio, " "])
+            writer.writerow([self.type, '', self.ticker, self.shares, self.quantity, self.ratio_to_entire_portfolio, ''])
     
     def updateMarkets(self):
         pass

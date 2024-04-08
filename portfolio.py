@@ -66,7 +66,7 @@ class Portfolio:
   def print_to_csv(self, filename):
       with open(filename, 'w', newline='') as file:
           writer = csv.writer(file)
-          writer.writerow(["Ticker", "Shares", "Current Price", "Ratio to entire portfolio", "Beta SP"])
+          writer.writerow(["Ticker", "Industry", "Shares", "Current Price", "Ratio to entire portfolio", "Beta SP"])
       for asset in self.assets:
           asset.to_csv(filename)
 
