@@ -8,5 +8,6 @@ from portfolio import Portfolio
 p = Portfolio()
 p.read_portfolio('portfolio.csv')
 # p.print_portfolio()
-p.print_to_csv('output.csv')
-# p.test()
+# p.print_to_csv('output.csv')
+p.print_industries()
+# p.rebalance('target_ratios.csv')

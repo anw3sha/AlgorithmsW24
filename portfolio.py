@@ -76,7 +76,21 @@ class Portfolio:
           asset.ratio_to_entire_portfolio = asset.quantity / self.total_value
       else:
           asset.ratio_to_entire_portfolio = asset.quantity * asset.ticker.history(period="1d")['Close'].iloc[-1] / self.total_value
-      
+  
+  def calculate_industry_ratios(self):
+    # Initialize a dictionary to store the total ratio for each industry
+    industry_ratios = {}
+
+    for asset in self.assets:
+        # If the asset's industry is not in the dictionary, add it with the asset's ratio
+        if asset.industry not in industry_ratios:
+            industry_ratios[asset.industry] = asset.ratio_to_entire_portfolio
+        # If the asset's industry is in the dictionary, add the asset's ratio to the total
+        else:
+            industry_ratios[asset.industry] += asset.ratio_to_entire_portfolio
+
+    return industry_ratios
+
   def updateMarkets(self):
       self.total_value = 0
       for asset in self.assets:
@@ -85,6 +99,10 @@ class Portfolio:
       self.total_value = self.portfolio_size()
       self.fix_ratios()
 
+  def print_industries(self):
+    for asset in self.assets[1:]:  
+        print(asset.industry)
+        print("\n")
      
   def buy(self, ticker, quantity):
     if ticker == 'CASH':
@@ -107,21 +125,46 @@ class Portfolio:
   def sell(self, ticker, quantity):
     for asset in self.assets:
       if asset.ticker == ticker:
+        sale_amount = asset.current_price * quantity
+        if self.assets[0].quantity - sale_amount < 0:  # check if the sale would result in negative cash
+          print("Insufficient cash to sell this quantity of asset.")
+          return
         asset.quantity -= quantity
-        self.assets[0].quantity += asset.current_price * quantity # update cash
+        self.assets[0].quantity -= sale_amount  # update cash
         if asset.quantity == 0:
           self.assets.remove(asset)
-          # update cash
-      else:
+        else:
           print("Asset not found")
     self.updateMarkets()
 
-    
-  def test(self):
-    print(self.assets[3].ticker.info)
+  def rebalance(self, csv_file):
+    # read the target ratios from a CSV file
+    target_ratios_df = pd.read_csv(csv_file)
+    target_ratios = dict(zip(target_ratios_df['industry'], target_ratios_df['target percentage']))
 
-  def rebalance():
+    # calculate the current industry ratios
+    current_ratios = self.calculate_industry_ratios()
+
+    tolerance = 0.05  # adjust this value as needed
+    balanced = False
+
+    while not balanced:
+      balanced = True
+
+      for industry, current_ratio in current_ratios.items():
+        target_ratio = target_ratios.get(industry, 0)
+
+        if abs(current_ratio - target_ratio) > tolerance:
+          balanced = False
+          # find the assets in this industry, starting from the second asset
+          assets_in_industry = [asset for asset in self.assets[1:] if asset.industry == industry]
+          for asset in assets_in_industry:
+            if current_ratio > target_ratio:
+              asset.sell(asset.ticker, 1) # sell one share
+            else:
+              asset.buy(asset.ticker, 1) # buy one share
+
     self.updateMarkets()
+    current_ratios = self.calculate_industry_ratios()
        
-      # accept a csv file with the new ratios, then rebalance the portfolio and update markets
-      # buy and sell according to intented ratios
+      # Consumer Cyclical, Industrials, ETF, Fixed Income, Communication Services, Financial Services, Healthcare, Technology
