@@ -134,6 +134,24 @@ class Portfolio:
                 return
   
   def calcSharpe(self):
+    portfolio_daily_returns = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date))
+    end_date = pd.Timestamp.now()
+    start_date = end_date - pd.DateOffset(years=1)
+    
+    for stock in self.assets:
+        if stock.returns is not None:
+            portfolio_daily_returns[stock.ticker] = stock.returns * stock.shares
+
+    portfolio_daily_returns = portfolio_daily_returns.sum(axis=1)
+    
+    annualized_return = portfolio_daily_returns.mean() * 252
+    portfolio_std_dev = portfolio_daily_returns.std() * np.sqrt(252)
+
+    risk_free_rate = 0.01  # Example risk-free rate
+    sharpe_ratio = (annualized_return - risk_free_rate) / portfolio_std_dev
+
+    print(f"Sharpe Ratio: {sharpe_ratio}")
+
     
 
   def sell(self, ticker, quantity):
