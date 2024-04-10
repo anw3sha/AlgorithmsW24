@@ -62,6 +62,10 @@ class Equity(Asset):
         
     def updateMarkets(self):
         self.current_price = self.ticker.history(period="1d")['Close'].iloc[-1]
+        end_date = pd.Timestamp.now()
+        start_date = end_date - pd.DateOffset(years=1)
+        self.prices = yf.download(self.ticker, start=start_date, end=end_date)
+
         self.avg_volume = self.ticker.info['averageVolume']
         self.fifty_two_week_high = self.ticker.info['fiftyTwoWeekHigh']
         self.fifty_two_week_low = self.ticker.info['fiftyTwoWeekLow']
@@ -69,10 +73,10 @@ class Equity(Asset):
           self.beta_SP = self.ticker.info['beta']
         except KeyError:
           try:
-            self.beta_SP = self.ticker.info['beta3Year']
+            self.beta_SP = self.ticker.info['beta3Year'] # idk
           except KeyError:
             try:
-              self.beta_SP = self.ticker.info['beta5Year']
+              self.beta_SP = self.ticker.info['beta5Year'] # idk
             except KeyError:
               self.beta_SP = None
     
