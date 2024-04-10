@@ -4,9 +4,11 @@ from enum import Enum
 
 class Portfolio:
 
+
   def __init__(self):
       self.assets = []
       self.total_value = 0
+      self.riskFreeRate = yf.download('^TNX', period="1d")['Close'].iloc[-1]
 
   # def read_portfolio(self, file_path):
   #     file = pd.read_csv(file_path)
@@ -98,6 +100,7 @@ class Portfolio:
       
       self.total_value = self.portfolio_size()
       self.fix_ratios()
+      self.riskFreeRate = yf.download('^TNX', period="1d")['Close'].iloc[-1]
 
   def print_industries(self):
     for asset in self.assets[1:]:  
@@ -130,6 +133,12 @@ class Portfolio:
                 self.updateMarkets()
                 return
   
+  def calcSharpe(self):
+    total_sharpe = 0
+    for asset in self.assets:
+        total_sharpe += asset.sharpe_ratio
+    return total_sharpe
+
   def sell(self, ticker, quantity):
     for asset in self.assets:
         if asset.ticker == ticker:

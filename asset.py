@@ -38,7 +38,6 @@ class Equity(Asset):
         self.current_price = self.ticker.history(period="1d")['Close'].iloc[-1]
         end_date = pd.Timestamp.now()
         start_date = end_date - pd.DateOffset(years=1)
-        self.prices = pd.DataFrame()
         self.prices = yf.download(ticker, start=start_date, end=end_date)
         self.returns = self.prices.pct_change()
 
