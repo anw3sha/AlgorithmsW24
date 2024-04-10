@@ -109,32 +109,37 @@ class Portfolio:
         self.assets[0].quantity += quantity
         self.updateMarkets()
     else: 
-      for asset in self.assets:
-        if asset.ticker == ticker:
-          asset.quantity += quantity
-          self.assets[0].quantity -= asset.current_price * quantity # update cash
-          self.updateMarkets()
-          return
-        else: 
-           equity = Equity(ticker, quantity)
-           self.assets.append(equity)
-           self.assets[0].quantity -= asset.current_price * quantity # update cash
-           self.updateMarkets()
-           return
+        for asset in self.assets:
+            if asset.ticker == ticker:
+                purchase_amount = asset.current_price * quantity
+                if self.assets[0].quantity - purchase_amount < 0:  # Check if the purchase would result in negative cash
+                    print("Insufficient cash to buy this quantity of asset.")
+                    return
+                asset.quantity += quantity
+                self.assets[0].quantity -= purchase_amount  # update cash
+                self.updateMarkets()
+                return
+            else: 
+                equity = Equity(ticker, quantity)
+                purchase_amount = equity.current_price * quantity
+                if self.assets[0].quantity - purchase_amount < 0:  # Check if the purchase would result in negative cash
+                    print("Insufficient cash to buy this quantity of asset.")
+                    return
+                self.assets.append(equity)
+                self.assets[0].quantity -= purchase_amount  # update cash
+                self.updateMarkets()
+                return
   
   def sell(self, ticker, quantity):
     for asset in self.assets:
-      if asset.ticker == ticker:
-        sale_amount = asset.current_price * quantity
-        if self.assets[0].quantity - sale_amount < 0:  # check if the sale would result in negative cash
-          print("Insufficient cash to sell this quantity of asset.")
-          return
-        asset.quantity -= quantity
-        self.assets[0].quantity -= sale_amount  # update cash
-        if asset.quantity == 0:
-          self.assets.remove(asset)
+        if asset.ticker == ticker:
+            sale_amount = asset.current_price * quantity
+            asset.quantity -= quantity
+            self.assets[0].quantity += sale_amount  # update cash
+            if asset.quantity == 0:
+                self.assets.remove(asset)
         else:
-          print("Asset not found")
+            print("Asset not found")
     self.updateMarkets()
 
   def rebalance(self, csv_file):
