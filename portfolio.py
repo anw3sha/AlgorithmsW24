@@ -134,10 +134,7 @@ class Portfolio:
                 return
   
   def calcSharpe(self):
-    total_sharpe = 0
-    for asset in self.assets:
-        total_sharpe += asset.sharpe_ratio
-    return total_sharpe
+    
 
   def sell(self, ticker, quantity):
     for asset in self.assets:
