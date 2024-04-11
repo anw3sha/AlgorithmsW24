@@ -134,11 +134,14 @@ class Portfolio:
                 return
   
   def calcSharpe(self):
-    portfolio_daily_returns = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date))
     end_date = pd.Timestamp.now()
     start_date = end_date - pd.DateOffset(years=1)
-    
+    portfolio_daily_returns = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date))
+
     for stock in self.assets:
+        if stock.classification == AssetType.CASH: 
+          continue
+        
         if stock.returns is not None:
             portfolio_daily_returns[stock.ticker] = stock.returns * stock.shares
 
