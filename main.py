@@ -41,7 +41,7 @@ curr_final_sharp = temp.calcSharpe()
 curr_final_portfolio = temp
 
 
-for k in range(0, 5):
+for k in range(0, 100):
     
     temp_total_equity = total_equity_value
     new_temp = p
