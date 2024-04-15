@@ -2,6 +2,21 @@ from portfolio import Portfolio
 import random
 from asset import *
 
+
+def Rebalance_main(target, p):
+    for i in range(0, len(target.assets)):
+        if target.assets[i].classification == AssetType.CASH: 
+            continue
+
+        difference = target.assets[i].shares - p.assets[i].shares
+
+        #print(difference)
+
+        if difference > 0:
+            print(f"Buy {abs(difference)} shares of {target.assets[i].tickerstr}")
+        elif difference < 0:
+            print(f"Sell {abs(difference)} shares of {target.assets[i].tickerstr}")
+
 #update function
 #print everything
 #buy function and sell function and rebalace it based on that
@@ -26,7 +41,7 @@ curr_final_sharp = temp.calcSharpe()
 curr_final_portfolio = temp
 
 
-for k in range(0, 100):
+for k in range(0, 5):
     
     temp_total_equity = total_equity_value
     new_temp = p
@@ -57,5 +72,27 @@ for equity in curr_final_portfolio.assets:
 
 print(total)
 
+curr = Portfolio()
+curr.read_portfolio('portfolio.csv')
+
+Rebalance_main(curr_final_portfolio, curr)
 
 
+
+
+"""
+Final Sharpe: 2.583967902009879
+MTN: 4
+GNRC: 29
+SPMD: 53
+SGOV: 27
+META: 52
+VIRT: 67
+VRTX: 37
+PERI: 37
+CSV: 23
+AX: 4
+GTX: 0
+ENPH: 4
+Total Equity Assets: 337
+"""
