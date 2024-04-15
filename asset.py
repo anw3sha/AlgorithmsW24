@@ -1,7 +1,7 @@
 import numpy as np
 import yfinance as yf
 import pandas as pd
-import talib as ta
+#import talib as ta
 import datetime
 from enum import Enum
 import csv
@@ -39,7 +39,10 @@ class Equity(Asset):
         end_date = pd.Timestamp.now()
         start_date = end_date - pd.DateOffset(years=1)
         self.prices = yf.download(ticker, start=start_date, end=end_date)
+        self.prices = self.prices['Open']
         self.returns = self.prices.pct_change()
+        self.returns = self.returns.dropna()
+
 
         self.ratio_to_entire_portfolio = -1.0
 
