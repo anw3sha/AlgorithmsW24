@@ -107,6 +107,7 @@ class Cash(Asset):
         self.shares = 1       
         self.ratio_to_entire_portfolio = -1.0
         self.classification = AssetType.CASH
+        self.current_price = quantity
 
     def print(self):
         print("Ticker: ", self.ticker)
