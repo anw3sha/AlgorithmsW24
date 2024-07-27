@@ -107,3 +107,40 @@ if __name__ == "__main__":
             print(f"Cash: ${asset.quantity:.2f}")
         else:
             print(f"{asset.tickerstr}: {asset.quantity:.2f} shares")
+
+'''
+Original Portfolio Value: $19816.78
+
+Initial Value of Best Portfolio: $19809.98
+Final Value of Best Portfolio: $30937.21
+
+Original Portfolio Configuration:
+Cash: $70.14
+MTN: 46.00 shares
+GNRC: 44.00 shares
+SPMD: 77.00 shares
+SGOV: 1.00 shares
+META: 0.00 shares
+VIRT: 1.00 shares
+VRTX: 0.00 shares
+PERI: 3.00 shares
+CSV: 0.00 shares
+AX: 0.00 shares
+GTX: 0.00 shares
+ENPH: 0.00 shares
+
+Best Portfolio Configuration:
+Cash: $70.14
+MTN: 103.00 shares
+GNRC: 0.00 shares
+SPMD: 10.00 shares
+SGOV: 0.00 shares
+META: 0.00 shares
+VIRT: 9.00 shares
+VRTX: 0.00 shares
+PERI: 0.00 shares
+CSV: 0.00 shares
+AX: 0.00 shares
+GTX: 0.00 shares
+ENPH: 0.00 shares
+'''
